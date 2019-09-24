@@ -17,11 +17,11 @@ TEST_CASE("SimpleTests") {
 }
 
 TEST_CASE("RandomTests") {
-    const int testCount = 100;
+    constexpr int testCount = 100;
+    constexpr int textLength = 300000;
     std::minstd_rand rand;
     rand.seed(0);
     for (int i = 0; i < testCount; ++i) {
-        const int textLength = 300000;
         std::string text(textLength, 0);
         std::generate_n(text.begin(), textLength, 
             [&rand]() { return "abcdefghijklmnopqrstuvwxyz"[rand() % 26]; });
