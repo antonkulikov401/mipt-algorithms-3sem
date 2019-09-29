@@ -3,7 +3,7 @@
 
 std::unordered_set<char> GetProhibitedCharacters(
         const std::vector<int>& prefixFunction, 
-        std::string str,
+        const std::string& str,
         int index) {
     std::unordered_set<char> prohibitedCharacters;
     while (index >= 1) {
@@ -15,8 +15,8 @@ std::unordered_set<char> GetProhibitedCharacters(
 
 std::string GetStringByPrefixFunction(
         const std::vector<int>& prefixFunction,
-        std::string alphabet) {
-    std::string result = "";
+        const std::string& alphabet) {
+    std::string result;
     for (int i = 0; i < prefixFunction.size(); ++i) {
         if (prefixFunction[i] != 0)
             result += result[prefixFunction[i] - 1];

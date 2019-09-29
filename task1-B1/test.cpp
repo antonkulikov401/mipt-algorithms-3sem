@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "../unit-testing/catch.hpp"
 #include "string_functions.hpp"
 
 TEST_CASE("SimpleTests") {

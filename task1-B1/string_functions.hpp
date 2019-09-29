@@ -4,4 +4,4 @@
 
 std::string GetStringByPrefixFunction(
     const std::vector<int>& prefixFunction, 
-    std::string alphabet = "abcdefghijklmnopqrstuvwxyz");
+    const std::string& alphabet = "abcdefghijklmnopqrstuvwxyz");
