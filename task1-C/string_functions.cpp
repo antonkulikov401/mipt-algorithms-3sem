@@ -1,6 +1,7 @@
 #include "string_functions.hpp"
 #include "trie.hpp"
 #include <unordered_map>
+#include <algorithm>
 
 std::vector<std::pair<std::string, std::vector<size_t>>>
 GetSubpatterns(std::string pattern) {
@@ -26,21 +27,20 @@ GetSubpatterns(std::string pattern) {
 std::vector<size_t> FindPattern(const std::string& pattern,
         const std::string& text) {
     std::vector<size_t> indices;
-    Trie trie;
     auto subpatterns = GetSubpatterns(pattern);
-
-    for (size_t i = 0; i < subpatterns.size(); ++i)
-        trie.AddString(subpatterns[i].first, i);
-    trie.BuildSuffixLinks();
-    trie.BuildDictSuffixLinks();
+    std::vector<std::string> subpatternStrings;
+    std::transform(subpatterns.begin(), subpatterns.end(),
+        std::back_inserter(subpatternStrings),
+        [](const auto& p) { return p.first; });
+    Trie trie(subpatternStrings);
+    
     std::vector<size_t> patternEntries(text.size(), 0);
     for (size_t i = 0; i < text.size(); ++i) {
         trie.NextState(text[i]);
         auto foundPatterns = trie.GetPatternIndices();
-        for (int foundPattern : foundPatterns) {
+        for (int foundPattern : foundPatterns)
             for (int j : subpatterns[foundPattern].second)
                 if (i >= j) ++patternEntries[i - j];
-        }
     }
 
     size_t numOfSubpatterns = 0;
@@ -48,8 +48,8 @@ std::vector<size_t> FindPattern(const std::string& pattern,
         numOfSubpatterns += subpattern.second.size();
 
     for (size_t i = 0; i < text.size(); ++i)
-        if (patternEntries[i] == numOfSubpatterns)
-            if (i + pattern.size() <= text.size())
-                indices.push_back(i);
+        if (patternEntries[i] == numOfSubpatterns &&
+            (i + pattern.size() <= text.size()))
+            indices.push_back(i);
     return indices;
 }

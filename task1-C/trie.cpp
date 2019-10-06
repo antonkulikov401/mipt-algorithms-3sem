@@ -1,5 +1,13 @@
 #include "trie.hpp"
 
+Trie::Trie(const std::vector<std::string>& patterns) :
+        root(std::make_shared<TrieNode<alphabetSize>>()), currState(root) {
+    for (size_t i = 0; i < patterns.size(); ++i)
+        AddString(patterns[i], i);
+    BuildSuffixLinks();
+    BuildDictSuffixLinks();
+}
+
 void Trie::AddString(const std::string& str, size_t patternIndex) {
     auto currNode = root;
     for (size_t i = 0; i < str.size(); ++i) {
@@ -8,10 +16,10 @@ void Trie::AddString(const std::string& str, size_t patternIndex) {
         if (currNode->GetChild(symbolIndex)) {
             currNode = currNode->GetChild(symbolIndex);
             if (isTerminal) currNode->SetPatternIndex(patternIndex);
+            continue;
         }
-        else
-            currNode = currNode->SetChild(symbolIndex, 
-                isTerminal ? patternIndex : -1);
+        currNode = currNode->SetChild(symbolIndex, 
+            isTerminal ? patternIndex : -1);
     }
 }
 
@@ -28,11 +36,15 @@ void Trie::BFS(std::function<void(TrieNode<alphabetSize>::NodePtr)> func) {
 }
 
 void Trie::BuildSuffixLinks() {
-    BFS([](TrieNode<alphabetSize>::NodePtr v) { v->SetSuffixLink(); });
+    BFS([](TrieNode<alphabetSize>::NodePtr v) {
+        v->CalculateSuffixLinks();
+    });
 }
 
 void Trie::BuildDictSuffixLinks() {
-    BFS([](TrieNode<alphabetSize>::NodePtr v) { v->SetDictSuffixLink(); });
+    BFS([](TrieNode<alphabetSize>::NodePtr v) {
+        v->CalculateDictSuffixLinks();
+    });
 }
 
 void Trie::NextState(char symbol) {

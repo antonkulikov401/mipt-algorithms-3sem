@@ -18,8 +18,8 @@ public:
     NodePtr SetChild(size_t i, int _patternIndex);
     void SetPatternIndex(int _patternIndex);
     int GetPatternIndex() const;
-    void SetSuffixLink();
-    void SetDictSuffixLink();
+    void CalculateSuffixLinks();
+    void CalculateDictSuffixLinks();
     NodePtr GetSuffixLink();
     NodePtr GetDictSuffixLink();
 
@@ -34,11 +34,7 @@ private:
 
 class Trie {
 public:
-    Trie() : root(std::make_shared<TrieNode<alphabetSize>>()),
-        currState(root) {}
-    void AddString(const std::string& str, size_t patternIndex);
-    void BuildSuffixLinks();
-    void BuildDictSuffixLinks();
+    Trie(const std::vector<std::string>& patterns);
     void NextState(char symbol);
     std::vector<size_t> GetPatternIndices();
 
@@ -48,6 +44,9 @@ private:
     std::shared_ptr<TrieNode<alphabetSize>> currState;
 
     void BFS(std::function<void(TrieNode<alphabetSize>::NodePtr)> func);
+    void AddString(const std::string& str, size_t patternIndex);
+    void BuildSuffixLinks();
+    void BuildDictSuffixLinks();
 };
 
 template<size_t AlphabetSize>
@@ -95,32 +94,34 @@ int TrieNode<AlphabetSize>::GetPatternIndex() const {
 }
 
 template<size_t AlphabetSize>
-void TrieNode<AlphabetSize>::SetSuffixLink() {
-    if (parent.expired())
+void TrieNode<AlphabetSize>::CalculateSuffixLinks() {
+    if (parent.expired()) {
         suffixLink = this->shared_from_this();
-    else if (parent.lock()->parent.expired())
-        suffixLink = parent.lock();
-    else {
-        auto currVertex = parent.lock()->suffixLink.lock();
-        while (!currVertex->children[edgeToParent] &&
-                !currVertex->parent.expired())
-            currVertex = currVertex->suffixLink.lock();
-        suffixLink = currVertex->children[edgeToParent] ?
-            currVertex->children[edgeToParent] : currVertex;
+        return;
     }
+    else if (parent.lock()->parent.expired()) {
+        suffixLink = parent;
+        return;
+    }
+    auto currVertex = parent.lock()->suffixLink.lock();
+    while (!currVertex->children[edgeToParent] &&
+            !currVertex->parent.expired())
+        currVertex = currVertex->suffixLink.lock();
+    suffixLink = currVertex->children[edgeToParent] ?
+        currVertex->children[edgeToParent] : currVertex;
 }
 
 template<size_t AlphabetSize>
-void TrieNode<AlphabetSize>::SetDictSuffixLink() {
-    if (parent.expired() || parent.lock()->parent.expired())
+void TrieNode<AlphabetSize>::CalculateDictSuffixLinks() {
+    if (parent.expired() || parent.lock()->parent.expired()) {
         dictSuffixLink = NodePtr();
-    else {
-        auto currVertex = suffixLink.lock();
-        while (!currVertex->parent.expired() && !currVertex->isTerminal())
-            currVertex = currVertex->suffixLink.lock();
-        dictSuffixLink = currVertex->parent.expired() ?
-            NodePtr() : currVertex;
+        return;
     }
+    auto currVertex = suffixLink.lock();
+    while (!currVertex->parent.expired() && !currVertex->isTerminal())
+        currVertex = currVertex->suffixLink.lock();
+    dictSuffixLink = currVertex->parent.expired() ?
+        NodePtr() : currVertex;
 }
 
 template<size_t AlphabetSize>
