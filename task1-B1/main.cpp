@@ -3,10 +3,10 @@
 #include "string_functions.hpp"
 
 int main() {
-    std::vector<int> prefixFunction;
-    int input = 0;
+    std::vector<size_t> prefixFunction;
+    size_t input = 0;
     while (std::cin >> input)
         prefixFunction.push_back(input);
-    std::cout << GetStringByPrefixFunction(prefixFunction);
+    std::cout << GetStringByPrefixFunction(prefixFunction) << "\n";
     return 0;
 }

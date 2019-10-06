@@ -3,5 +3,5 @@
 #include <string>
 
 std::string GetStringByPrefixFunction(
-    const std::vector<int>& prefixFunction, 
-    const std::string& alphabet = "abcdefghijklmnopqrstuvwxyz");
+    const std::vector<size_t>& prefixFunction, 
+    size_t alphabetSize = 26, char firstSymbol = 'a');

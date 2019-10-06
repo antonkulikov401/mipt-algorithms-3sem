@@ -2,9 +2,9 @@
 #include <unordered_set>
 
 std::unordered_set<char> GetProhibitedCharacters(
-        const std::vector<int>& prefixFunction, 
+        const std::vector<size_t>& prefixFunction, 
         const std::string& str,
-        int index) {
+        size_t index) {
     std::unordered_set<char> prohibitedCharacters;
     while (index >= 1) {
         prohibitedCharacters.insert(str[prefixFunction[index - 1]]);
@@ -14,16 +14,17 @@ std::unordered_set<char> GetProhibitedCharacters(
 }
 
 std::string GetStringByPrefixFunction(
-        const std::vector<int>& prefixFunction,
-        const std::string& alphabet) {
+        const std::vector<size_t>& prefixFunction,
+        size_t alphabetSize, char firstSymbol) {
     std::string result;
-    for (int i = 0; i < prefixFunction.size(); ++i) {
+    for (size_t i = 0; i < prefixFunction.size(); ++i) {
         if (prefixFunction[i] != 0)
             result += result[prefixFunction[i] - 1];
         else {
             auto prohibitedCharacters = 
                 GetProhibitedCharacters(prefixFunction, result, i);
-            for (char ch : alphabet) {
+            for (char ch = firstSymbol; ch < firstSymbol + alphabetSize; 
+                    ++ch) {
                 if (!prohibitedCharacters.count(ch)) {
                     result += ch;
                     break;
