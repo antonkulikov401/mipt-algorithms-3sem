@@ -36,20 +36,3 @@ void FindSubstring(std::string pattern, IStream inIteratorBegin,
         ++inIteratorBegin;
     }
 }
-
-template<class IStream, class OStream>
-void FindSubstringNaive(std::string pattern, IStream inIteratorBegin,
-        IStream inIteratorEnd, OStream outIterator) {
-    std::string currentInput;
-    size_t currIndex = 0;
-    while (inIteratorBegin != inIteratorEnd) {
-        char symbol = *inIteratorBegin;
-        currentInput += symbol;
-        if (currentInput.length() > pattern.length())
-            currentInput.erase(0, 1);
-        if (currentInput == pattern)
-            *outIterator = currIndex - pattern.length() + 1;
-        ++currIndex;
-        ++inIteratorBegin;
-    }
-}
