@@ -1,6 +1,6 @@
 #include "trie.hpp"
 
-void Trie::AddString(const std::string& str, int patternIndex) {
+void Trie::AddString(const std::string& str, size_t patternIndex) {
     auto currNode = root;
     for (size_t i = 0; i < str.size(); ++i) {
         size_t symbolIndex = str[i] - 'a';
@@ -15,24 +15,24 @@ void Trie::AddString(const std::string& str, int patternIndex) {
     }
 }
 
-void Trie::BFS(void (TrieNode<alphabetSize>::* func)()) {
-    std::queue<std::shared_ptr<TrieNode<alphabetSize>>> q;
+void Trie::BFS(std::function<void(TrieNode<alphabetSize>::NodePtr)> func) {
+    std::queue<TrieNode<alphabetSize>::NodePtr> q;
     q.push(root);
     while (!q.empty()) {
         auto currVertex = q.front();
         q.pop();
-        ((*currVertex).*func)();
+        func(currVertex);
         for (auto child : currVertex->GetChildren())
             if (child) q.push(child);
     }
 }
 
 void Trie::BuildSuffixLinks() {
-    BFS(&TrieNode<alphabetSize>::SetSuffixLink);
+    BFS([](TrieNode<alphabetSize>::NodePtr v) { v->SetSuffixLink(); });
 }
 
 void Trie::BuildDictSuffixLinks() {
-    BFS(&TrieNode<alphabetSize>::SetDictSuffixLink);
+    BFS([](TrieNode<alphabetSize>::NodePtr v) { v->SetDictSuffixLink(); });
 }
 
 void Trie::NextState(char symbol) {
@@ -43,8 +43,8 @@ void Trie::NextState(char symbol) {
         currState->GetChild(symbolIndex) : currState;
 }
 
-std::vector<int> Trie::GetPatternIndices() {
-    std::vector<int> indices;
+std::vector<size_t> Trie::GetPatternIndices() {
+    std::vector<size_t> indices;
     auto currVertex = currState;
     if (currVertex->isTerminal())
         indices.push_back(currVertex->GetPatternIndex());

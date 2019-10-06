@@ -2,11 +2,11 @@
 #include "trie.hpp"
 #include <unordered_map>
 
-std::vector<std::pair<const std::string, std::vector<int>>>
+std::vector<std::pair<std::string, std::vector<size_t>>>
 GetSubpatterns(std::string pattern) {
     if (pattern[pattern.size() - 1] != '?')
         pattern += '?';
-    std::unordered_map<std::string, std::vector<int>> subpatterns;
+    std::unordered_map<std::string, std::vector<size_t>> subpatterns;
     auto subpatternBegin = pattern.begin();
     size_t index = 0;
     for (auto subpatternEnd = pattern.begin(); subpatternEnd != pattern.end();
@@ -19,22 +19,22 @@ GetSubpatterns(std::string pattern) {
         }
         ++index;
     }
-    return std::vector<std::pair<const std::string,
-        std::vector<int>>>(subpatterns.begin(), subpatterns.end());
+    return std::vector<std::pair<std::string,
+        std::vector<size_t>>>(subpatterns.begin(), subpatterns.end());
 }
 
-std::vector<int> FindPattern(const std::string& pattern,
+std::vector<size_t> FindPattern(const std::string& pattern,
         const std::string& text) {
-    std::vector<int> indices;
+    std::vector<size_t> indices;
     Trie trie;
     auto subpatterns = GetSubpatterns(pattern);
 
-    for (int i = 0; i < subpatterns.size(); ++i)
+    for (size_t i = 0; i < subpatterns.size(); ++i)
         trie.AddString(subpatterns[i].first, i);
     trie.BuildSuffixLinks();
     trie.BuildDictSuffixLinks();
-    std::vector<int> patternEntries(text.size(), 0);
-    for (int i = 0; i < text.size(); ++i) {
+    std::vector<size_t> patternEntries(text.size(), 0);
+    for (size_t i = 0; i < text.size(); ++i) {
         trie.NextState(text[i]);
         auto foundPatterns = trie.GetPatternIndices();
         for (int foundPattern : foundPatterns) {
@@ -47,7 +47,7 @@ std::vector<int> FindPattern(const std::string& pattern,
     for (const auto& subpattern : subpatterns)
         numOfSubpatterns += subpattern.second.size();
 
-    for (int i = 0; i < text.size(); ++i)
+    for (size_t i = 0; i < text.size(); ++i)
         if (patternEntries[i] == numOfSubpatterns)
             if (i + pattern.size() <= text.size())
                 indices.push_back(i);
