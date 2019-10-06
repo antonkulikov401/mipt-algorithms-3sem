@@ -18,19 +18,20 @@ TEST_CASE("SimpleTests") {
     for (auto& test : tests) {
         auto textStream = std::istringstream(std::get<1>(test));
         auto outputStream = std::ostringstream();
-        FindSubstring(std::get<0>(test), 
+        FindSubstring(std::get<0>(test),
             std::istream_iterator<char>(textStream),
-            std::ostream_iterator<int>(outputStream, " "));
+            std::istream_iterator<char>(),
+            std::ostream_iterator<size_t>(outputStream, " "));
         REQUIRE(outputStream.str() == std::get<2>(test));
     }
 }
 
 TEST_CASE("RandomTests") {
-    constexpr int testCount = 100;
-    constexpr int textLength = 300000;
+    constexpr size_t testCount = 100;
+    constexpr size_t textLength = 300000;
     std::minstd_rand rand;
     rand.seed(0);
-    for (int i = 0; i < testCount; ++i) {
+    for (size_t i = 0; i < testCount; ++i) {
         std::string text(textLength, 0);
         std::generate_n(text.begin(), textLength,
             [&rand]() { return "abcdefghijklmnopqrstuvwxyz"[rand() % 26]; });
@@ -40,10 +41,12 @@ TEST_CASE("RandomTests") {
         auto secondOutputStream = std::ostringstream();
         FindSubstring(text.substr(0, 3),
             std::istream_iterator<char>(firstTextStream),
-            std::ostream_iterator<int>(firstOutputStream, " "));
+            std::istream_iterator<char>(),
+            std::ostream_iterator<size_t>(firstOutputStream, " "));
         FindSubstringNaive(text.substr(0, 3),
             std::istream_iterator<char>(secondTextStream),
-            std::ostream_iterator<int>(secondOutputStream, " "));
+            std::istream_iterator<char>(),
+            std::ostream_iterator<size_t>(secondOutputStream, " "));
         REQUIRE(firstOutputStream.str() == secondOutputStream.str());
     }
 }
