@@ -34,16 +34,13 @@ std::vector<size_t> SortCyclicShifts(const std::string& s,
     std::vector<size_t> shifts(s.size());
     std::vector<size_t> classes(s.size());
     std::vector<size_t> newShifts(s.size());
-    auto getSymbolIndex = [&firstSymbol](char ch) {
-        return ch - firstSymbol;
-    };
 
     size_t classesCount = alphabetSize;
     for (size_t i = 0; i < s.size(); ++i) newShifts[i] = i;
-    for (size_t i = 0; i < s.size(); ++i) classes[i] = getSymbolIndex(s[i]);
+    for (size_t i = 0; i < s.size(); ++i) classes[i] = s[i] - firstSymbol;
     CountingSort(shifts, classes, newShifts, classesCount, s.size());
     CalculateClasses(classes, shifts, classesCount, s.size(), 0, true);
-
+    
     for (size_t len = 1; len < s.size(); len *= 2) {
         for (size_t i = 0; i < s.size(); ++i) {
             int64_t newValue = shifts[i] - len;
