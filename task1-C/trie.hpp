@@ -3,6 +3,7 @@
 #include <memory>
 #include <queue>
 #include <functional>
+#include <string_view>
 
 template <size_t AlphabetSize>
 class TrieNode : public std::enable_shared_from_this<TrieNode<AlphabetSize>> {
@@ -34,7 +35,7 @@ private:
 
 class Trie {
 public:
-    Trie(const std::vector<std::string>& patterns);
+    Trie(const std::vector<std::string_view>& patterns);
     void NextState(char symbol);
     std::vector<size_t> GetPatternIndices();
 
@@ -44,7 +45,7 @@ private:
     std::shared_ptr<TrieNode<alphabetSize>> currState;
 
     void BFS(std::function<void(TrieNode<alphabetSize>::NodePtr)> func);
-    void AddString(const std::string& str, size_t patternIndex);
+    void AddString(std::string_view str, size_t patternIndex);
     void BuildSuffixLinks();
     void BuildDictSuffixLinks();
 };
@@ -99,7 +100,7 @@ void TrieNode<AlphabetSize>::CalculateSuffixLinks() {
         suffixLink = this->shared_from_this();
         return;
     }
-    else if (parent.lock()->parent.expired()) {
+    if (parent.lock()->parent.expired()) {
         suffixLink = parent;
         return;
     }

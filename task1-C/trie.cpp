@@ -1,6 +1,6 @@
 #include "trie.hpp"
 
-Trie::Trie(const std::vector<std::string>& patterns) :
+Trie::Trie(const std::vector<std::string_view>& patterns) :
         root(std::make_shared<TrieNode<alphabetSize>>()), currState(root) {
     for (size_t i = 0; i < patterns.size(); ++i)
         AddString(patterns[i], i);
@@ -8,7 +8,7 @@ Trie::Trie(const std::vector<std::string>& patterns) :
     BuildDictSuffixLinks();
 }
 
-void Trie::AddString(const std::string& str, size_t patternIndex) {
+void Trie::AddString(std::string_view str, size_t patternIndex) {
     auto currNode = root;
     for (size_t i = 0; i < str.size(); ++i) {
         size_t symbolIndex = str[i] - 'a';
