@@ -11,13 +11,12 @@ struct Vector2 {
     bool operator==(const Vector2&) const;
 };
 
-struct Edge {
+struct Segment {
     Vector2 first;
     Vector2 second;
     
-    Edge(const Vector2&, const Vector2&);
     void Sort();
-    bool operator==(const Edge&) const;
+    bool operator==(const Segment&) const;
 };
 
 double GetVoronoiAverageEdgeCount(std::vector<Vector2>&);

@@ -19,40 +19,41 @@ bool Vector2::operator==(const Vector2& other) const {
 template<>
 struct std::hash<Vector2> {
     size_t operator()(const Vector2& v) const {
-        return std::hash<double>()(v.x) ^ std::hash<double>()(v.y);
+        size_t h1 = std::hash<double>()(v.x);
+        size_t h2 = std::hash<double>()(v.y);
+        return h1 ^ (h2 << 1);
     }
 };
 
 template<>
-struct std::hash<Edge> {
-    size_t operator()(const Edge& e) const {
-        return std::hash<Vector2>()(e.first) ^ std::hash<Vector2>()(e.second);
+struct std::hash<Segment> {
+    size_t operator()(const Segment& e) const {
+        size_t h1 = std::hash<Vector2>()(e.first);
+        size_t h2 = std::hash<Vector2>()(e.second);
+        return h1 ^ (h2 << 1);
     }
 };
 
-Edge::Edge(const Vector2& first, const Vector2& second) :
-    first(first), second(second) {}
-
-bool Edge::operator==(const Edge& other) const {
+bool Segment::operator==(const Segment& other) const {
     return first == other.first && second == other.second;
 }
 
-void Edge::Sort() {
+void Segment::Sort() {
     if (second < first) std::swap(first, second);
 }
 
-Vector2 PointToVector2(const Point& point) {
+Vector2 ProjectionXY(const Point& point) {
     return { point.x, point.y };
 }
 
-std::vector<Edge> GetEdges(const Face& face) {
-    std::vector<Edge> edges;
-    edges.push_back(Edge(PointToVector2(face.first),
-        PointToVector2(face.second)));
-    edges.push_back(Edge(PointToVector2(face.first),
-        PointToVector2(face.third)));
-    edges.push_back(Edge(PointToVector2(face.third),
-        PointToVector2(face.second)));
+std::vector<Segment> GetEdges(const Face& face) {
+    std::vector<Segment> edges;
+    edges.push_back({ ProjectionXY(face.first),
+        ProjectionXY(face.second) });
+    edges.push_back({ ProjectionXY(face.first),
+        ProjectionXY(face.third) });
+    edges.push_back({ ProjectionXY(face.third),
+        ProjectionXY(face.second) });
     for (auto& edge : edges) edge.Sort();
     return edges;
 }
@@ -60,17 +61,17 @@ std::vector<Edge> GetEdges(const Face& face) {
 std::unordered_set<Vector2> GetVertices(std::vector<Face> hull) {
     std::unordered_set<Vector2> points;
     for (const auto& face : hull) {
-        points.insert(PointToVector2(face.first));
-        points.insert(PointToVector2(face.second));
-        points.insert(PointToVector2(face.third));
+        points.insert(ProjectionXY(face.first));
+        points.insert(ProjectionXY(face.second));
+        points.insert(ProjectionXY(face.third));
     }
     return points;
 }
 
-std::pair<std::unordered_set<Edge>, std::unordered_set<Edge>>
+std::pair<std::unordered_set<Segment>, std::unordered_set<Segment>>
 GetEdges(std::vector<Face>& hull) {
-    std::unordered_set<Edge> outerEdges;
-    std::unordered_set<Edge> innerEdges;
+    std::unordered_set<Segment> outerEdges;
+    std::unordered_set<Segment> innerEdges;
     for (const auto& face : hull) {
         auto edges = GetEdges(face);
         for (const auto& edge : edges) {
