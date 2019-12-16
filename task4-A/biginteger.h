@@ -92,9 +92,9 @@ BigInteger::BigInteger(BigInteger&& other) noexcept :
 
 BigInteger& BigInteger::operator=(const BigInteger& other)& {
     if (this == &other) return *this;
-    BigInteger copy = other;
+    auto copy = other.digits;
     sign = other.sign;
-    digits.swap(copy.digits);
+    digits.swap(copy);
     return *this;
 }
 
@@ -230,6 +230,7 @@ BigInteger& BigInteger::operator*=(const BigInteger& other) {
 }
 
 BigInteger& BigInteger::operator/=(const BigInteger& other) {
+    if (other == 0) throw std::overflow_error("Division by zero");
     if (this == &other) return *this = BigInteger(1);
     BigInteger res;
     bool newSign = sign ^ other.sign;
